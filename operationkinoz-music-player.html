@@ -1,0 +1,54 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OPERATIONKINOZ — MUSIC</title><style>
+:root{--bg:#151515;--fg:#f5f3ed;--surface:rgba(255,255,255,.085);--edge:rgba(255,255,255,.22)}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font-family:Arial,sans-serif;min-height:100vh;padding:32px 16px}main{max-width:760px;margin:auto}h1{font-weight:500;letter-spacing:.2em;text-align:center;font-size:clamp(17px,3vw,26px);margin:12px 0 35px}.panel{border:1px solid var(--edge);border-radius:15px;padding:22px;background:var(--surface)}.panelbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.panelbar h2{font-size:15px;letter-spacing:.1em;font-weight:500}.panelbar button{display:none}.player{display:flex;flex-direction:column;gap:17px}.playerControls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.smallbtn{border:1px solid var(--edge);color:inherit;background:transparent;border-radius:7px;padding:10px 14px;cursor:pointer;font:inherit;font-size:12px}.smallbtn:hover{background:var(--surface)}#playerMessage{min-height:18px;font-size:12px;color:#ffcfad}
+.albumTitle{font-size:18px;letter-spacing:.18em;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.albumTitle span{font-size:10px;letter-spacing:.1em;opacity:.65;font-weight:400}
+#trackLabel{font-size:18px;font-weight:600;line-height:1.4}
+.seekRow{display:flex;align-items:center;gap:10px;font-size:12px;font-variant-numeric:tabular-nums}.seekRow input{flex:1;min-width:0}
+.player input[type=range]{accent-color:#9ef3c5;cursor:pointer}.mainPlay{background:#d8f8e6!important;color:#111!important;border-color:#d8f8e6!important;min-width:90px!important;font-weight:700!important}
+.volumeLabel{font-size:11px;letter-spacing:.08em;opacity:.7}.playlist{display:flex;flex-direction:column;gap:3px;max-height:330px;overflow:auto;padding-top:8px;border-top:1px solid var(--edge)}
+.trackItem{width:100%;display:flex;align-items:center;gap:14px;text-align:left;background:transparent;border:0;border-radius:6px;color:inherit;padding:11px 12px;cursor:pointer;font:inherit;font-size:13px}.trackItem:hover,.trackItem.active{background:var(--surface)}.trackItem.active{outline:1px solid var(--edge)}
+.trackNumber{width:26px;flex-shrink:0;opacity:.6;font-variant-numeric:tabular-nums}.trackName{flex:1}.trackPlaying{font-size:10px;letter-spacing:.1em;opacity:.75}
+</style></head><body><main><h1>OPERATIONKINOZ</h1><section id="musicPanel" class="panel" aria-label="Music player">
+ <div class="panelbar"><h2>MUSIC PLAYER</h2><button class="smallbtn" type="button" data-close="musicPanel">CLOSE</button></div>
+ <div class="player">
+  <div class="albumTitle">KRAFTWERK <span>ESSENTIALS · 15 TRACKS</span></div>
+  <div id="trackLabel" aria-live="polite">01 — Trans-Europe Express</div>
+  <audio id="audioPlayer" preload="metadata" aria-label="Music playback"></audio>
+  <div class="seekRow"><span id="elapsed">0:00</span><input id="seekBar" type="range" min="0" max="1000" value="0" aria-label="Seek in track"><span id="duration">0:00</span></div>
+  <div class="playerControls">
+   <button id="prevTrack" class="smallbtn" type="button" aria-label="Previous track">PREV</button>
+   <button id="backOne" class="smallbtn" type="button" aria-label="Back one second">−1 SEC</button>
+   <button id="playPause" class="smallbtn mainPlay" type="button">PLAY</button>
+   <button id="forwardOne" class="smallbtn" type="button" aria-label="Forward one second">+1 SEC</button>
+   <button id="nextTrack" class="smallbtn" type="button" aria-label="Next track">NEXT</button>
+  </div>
+  <div class="playerControls"><label class="volumeLabel" for="volumeBar">VOLUME</label><input id="volumeBar" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volume"></div>
+  <div id="playerMessage" role="status" aria-live="polite"></div>
+  <div id="playlist" class="playlist" aria-label="Track list"></div>
+ </div>
+</section><p style="font-size:11px;opacity:.6;text-align:center;line-height:1.5;margin-top:24px">Media hosted in the Operationkinoz R2 music bucket. Public playback requires appropriate distribution rights.</p></main><script>(()=>{const R2_BASE="https://pub-605a5474ba3d4783a4538d26ddcf4389.r2.dev";
+const TRACKS=[{"title":"Trans-Europe Express","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/01 - Trans-Europe Express (2009 Remaster).mp3"},{"title":"The Model","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/02 - The Model (2009 Remaster).mp3"},{"title":"The Robots","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/03 - The Robots (2009 Remaster).mp3"},{"title":"Computer Love","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/04 - Computer Love (2009 Remaster).mp3"},{"title":"Radioactivity","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/05 - Radioactivity (2009 Remaster).mp3"},{"title":"Numbers","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/06 - Numbers (2009 Remaster).mp3"},{"title":"Autobahn","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/07 - Autobahn (2009 Remaster).mp3"},{"title":"Tour de France","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/08 - Tour de France (2009 Remaster).mp3"},{"title":"Pocket Calculator","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/09 - Pocket Calculator (2009 Remaster).mp3"},{"title":"Neon Lights","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/10 - Neon Lights (2009 Remaster).mp3"},{"title":"The Telephone Call","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/11 - The Telephone Call (2009 Remaster).mp3"},{"title":"The Man Machine","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/12 - The Man Machine (2009 Remaster).mp3"},{"title":"Computer World","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/13 - Computer World (2009 Remaster).mp3"},{"title":"Showroom Dummies","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/14 - Showroom Dummies (2009 Remaster).mp3"},{"title":"Musique Non Stop","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/15 - Musique Non Stop (2009 Remaster).mp3"}];
+const audio=document.getElementById('audioPlayer'),playPause=document.getElementById('playPause'),trackLabel=document.getElementById('trackLabel'),playerMessage=document.getElementById('playerMessage');
+const playlist=document.getElementById('playlist'),seekBar=document.getElementById('seekBar'),elapsed=document.getElementById('elapsed'),duration=document.getElementById('duration');
+let trackIndex=0;
+function trackUrl(key){return R2_BASE+'/'+key.split('/').map(encodeURIComponent).join('/')}
+function formatTime(seconds){if(!Number.isFinite(seconds))return '0:00';seconds=Math.max(0,Math.floor(seconds));return Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0')}
+function playerStatus(t){playerMessage.textContent=t}
+function updatePlayButton(){playPause.textContent=audio.paused?'PLAY':'PAUSE';for(const b of playlist.querySelectorAll('.trackItem')){const active=Number(b.dataset.index)===trackIndex;b.classList.toggle('active',active);b.setAttribute('aria-current',active?'true':'false');const state=b.querySelector('.trackPlaying');state.textContent=active&&!audio.paused?'PLAYING':'';}}
+function selectTrack(index,shouldPlay=false){trackIndex=(index+TRACKS.length)%TRACKS.length;const t=TRACKS[trackIndex];audio.pause();audio.src=trackUrl(t.key);audio.load();trackLabel.textContent=String(trackIndex+1).padStart(2,'0')+' — '+t.title;seekBar.value=0;elapsed.textContent='0:00';duration.textContent='0:00';playerStatus('');updatePlayButton();if(shouldPlay)startPlayback();}
+async function startPlayback(){try{await audio.play();playerStatus('')}catch(e){playerStatus('Browser blocked automatic playback. Press PLAY to start.')}}
+function togglePlayback(){if(audio.paused)startPlayback();else audio.pause()}
+TRACKS.forEach((t,i)=>{const b=document.createElement('button');b.type='button';b.className='trackItem';b.dataset.index=i;const n=document.createElement('span');n.className='trackNumber';n.textContent=String(i+1).padStart(2,'0');const name=document.createElement('span');name.className='trackName';name.textContent=t.title;const state=document.createElement('span');state.className='trackPlaying';b.append(n,name,state);b.addEventListener('click',()=>selectTrack(i,true));playlist.append(b)});
+playPause.addEventListener('click',togglePlayback);
+document.getElementById('prevTrack').addEventListener('click',()=>selectTrack(trackIndex-1,true));
+document.getElementById('nextTrack').addEventListener('click',()=>selectTrack(trackIndex+1,true));
+document.getElementById('backOne').addEventListener('click',()=>{audio.currentTime=Math.max(0,audio.currentTime-1)});
+document.getElementById('forwardOne').addEventListener('click',()=>{audio.currentTime=Math.min(Number.isFinite(audio.duration)?audio.duration:Infinity,audio.currentTime+1)});
+document.getElementById('volumeBar').addEventListener('input',e=>{audio.volume=Number(e.target.value)});
+seekBar.addEventListener('input',()=>{if(Number.isFinite(audio.duration)&&audio.duration>0)audio.currentTime=audio.duration*Number(seekBar.value)/1000});
+audio.addEventListener('timeupdate',()=>{elapsed.textContent=formatTime(audio.currentTime);if(Number.isFinite(audio.duration)&&audio.duration>0)seekBar.value=String(Math.round(1000*audio.currentTime/audio.duration))});
+audio.addEventListener('loadedmetadata',()=>{duration.textContent=formatTime(audio.duration)});
+audio.addEventListener('play',updatePlayButton);audio.addEventListener('pause',updatePlayButton);
+audio.addEventListener('ended',()=>selectTrack(trackIndex+1,true));
+audio.addEventListener('error',()=>playerStatus('Cannot load track. Check the R2 public URL and file permissions.'));
+audio.volume=.8;selectTrack(0,false);
+})();</script></body></html>

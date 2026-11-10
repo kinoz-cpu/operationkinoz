@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="te">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#151515">
+<title>OPERATIONKINOZ</title>
+<style>
+:root{--bg:#151515;--fg:#f5f3ed;--surface:rgba(255,255,255,.085);--edge:rgba(255,255,255,.22)}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:var(--bg);color:var(--fg);font-family:Arial,"Noto Sans Telugu",sans-serif;transition:background-color .4s,color .3s}
+main{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 18px;gap:20px}
+h1{font-size:clamp(17px,2.7vw,26px);font-weight:500;letter-spacing:.26em;margin:0;text-align:center}.sub{font-size:13px;letter-spacing:.1em;opacity:.8;text-align:center;margin:0}
+#mainBtn{width:min(64vw,240px);height:min(64vw,240px);border-radius:50%;border:2px solid currentColor;background:transparent;color:inherit;display:grid;place-items:center;cursor:pointer;touch-action:manipulation;user-select:none;transition:transform .15s,background-color .2s}#mainBtn svg{width:44%;height:44%;stroke:currentColor;stroke-width:5;fill:none;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}#mainBtn:hover{background:var(--surface)}
+#mainBtn:active{transform:scale(.95)}#mainBtn:focus-visible,.smallbtn:focus-visible{outline:3px solid currentColor;outline-offset:4px}
+.instructions{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 22px;text-align:center;font-size:13px;opacity:.88}.instructions span{white-space:nowrap}
+#message{min-height:23px;font-size:14px;text-align:center}
+.panel{width:min(900px,100%);border:1px solid var(--edge);border-radius:15px;padding:20px;background:var(--surface);backdrop-filter:blur(7px)}.hidden{display:none!important}
+.panelbar{display:flex;align-items:center;flex-wrap:wrap;gap:10px;justify-content:space-between;margin-bottom:18px}.panelbar h2{font-size:18px;font-weight:600;margin:0}.tools{display:flex;gap:8px;flex-wrap:wrap}.smallbtn{border:1px solid var(--edge);color:inherit;background:transparent;border-radius:7px;padding:9px 13px;cursor:pointer;font:inherit;font-size:13px}
+.smallbtn:hover{background:var(--surface)}.scene{margin:0 0 15px;padding:15px;border:1px solid var(--edge);border-radius:9px;background:rgba(0,0,0,.08)}.scene h3{font-size:14px;letter-spacing:.03em;margin:0 0 12px}.sceneText{min-height:100px;line-height:1.85;white-space:pre-wrap;font-size:16px;outline:none;overflow-wrap:anywhere}.sceneText[contenteditable=true]{border-radius:5px;outline:1px dashed var(--fg);outline-offset:6px}.hint{font-size:12px;opacity:.78;line-height:1.6}
+a{color:inherit}
+.player{display:flex;flex-direction:column;gap:14px}
+.player audio{width:100%;color-scheme:dark}
+.playerControls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.playerControls .smallbtn{min-width:68px}
+
+
+.albumTitle{font-size:18px;letter-spacing:.18em;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.albumTitle span{font-size:10px;letter-spacing:.1em;opacity:.65;font-weight:400}
+#trackLabel{font-size:18px;font-weight:600;line-height:1.4}
+.seekRow{display:flex;align-items:center;gap:10px;font-size:12px;font-variant-numeric:tabular-nums}.seekRow input{flex:1;min-width:0}
+.player input[type=range]{accent-color:#9ef3c5;cursor:pointer}.mainPlay{background:#d8f8e6!important;color:#111!important;border-color:#d8f8e6!important;min-width:90px!important;font-weight:700!important}
+.volumeLabel{font-size:11px;letter-spacing:.08em;opacity:.7}.playlist{display:flex;flex-direction:column;gap:3px;max-height:330px;overflow:auto;padding-top:8px;border-top:1px solid var(--edge)}
+.trackItem{width:100%;display:flex;align-items:center;gap:14px;text-align:left;background:transparent;border:0;border-radius:6px;color:inherit;padding:11px 12px;cursor:pointer;font:inherit;font-size:13px}.trackItem:hover,.trackItem.active{background:var(--surface)}.trackItem.active{outline:1px solid var(--edge)}
+.trackNumber{width:26px;flex-shrink:0;opacity:.6;font-variant-numeric:tabular-nums}.trackName{flex:1}.trackPlaying{font-size:10px;letter-spacing:.1em;opacity:.75}
+
+@media(max-width:550px){main{padding:30px 12px}.panel{padding:15px}.instructions{flex-direction:column;gap:7px}}
+</style>
+</head>
+<body>
+<main>
+<h1>OPERATIONKINOZ</h1>
+<button id="mainBtn" type="button" aria-label="Power"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 11 V49"/><path d="M30 24 A38 38 0 1 0 70 24"/></svg></button>
+<p class="sub">WELCOME</p>
+
+<div id="message" role="status" aria-live="polite"></div>
+<section id="musicPanel" class="panel hidden" aria-label="Music player">
+ <div class="panelbar"><h2>MUSIC PLAYER</h2><button class="smallbtn" type="button" data-close="musicPanel">CLOSE</button></div>
+ <div class="player">
+  <div class="albumTitle">KRAFTWERK <span>ESSENTIALS · 15 TRACKS</span></div>
+  <div id="trackLabel" aria-live="polite">01 — Trans-Europe Express</div>
+  <audio id="audioPlayer" preload="metadata" aria-label="Music playback"></audio>
+  <div class="seekRow"><span id="elapsed">0:00</span><input id="seekBar" type="range" min="0" max="1000" value="0" aria-label="Seek in track"><span id="duration">0:00</span></div>
+  <div class="playerControls">
+   <button id="prevTrack" class="smallbtn" type="button" aria-label="Previous track">PREV</button>
+   <button id="backOne" class="smallbtn" type="button" aria-label="Back one second">−1 SEC</button>
+   <button id="playPause" class="smallbtn mainPlay" type="button">PLAY</button>
+   <button id="forwardOne" class="smallbtn" type="button" aria-label="Forward one second">+1 SEC</button>
+   <button id="nextTrack" class="smallbtn" type="button" aria-label="Next track">NEXT</button>
+  </div>
+  <div class="playerControls"><label class="volumeLabel" for="volumeBar">VOLUME</label><input id="volumeBar" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volume"></div>
+  <div id="playerMessage" role="status" aria-live="polite"></div>
+  <div id="playlist" class="playlist" aria-label="Track list"></div>
+ </div>
+</section>
+<section id="scriptPanel" class="panel hidden" aria-label="Editable screenplay">
+ <div class="panelbar"><h2>అర్జున్ మరియు లేఖ — 4 సీన్లు</h2><div class="tools"><button id="editBtn" class="smallbtn" type="button">EDIT</button><button id="saveBtn" class="smallbtn" type="button">SAVE</button><button id="previewBtn" class="smallbtn" type="button">PREVIEW</button><button class="smallbtn" type="button" data-close="scriptPanel">CLOSE</button></div></div>
+ <article class="scene"><h3>సీన్ 1</h3><div class="sceneText" data-scene="1" contenteditable="false">SCENE 1 INT. AMBASSADOR CAR – DAY
+Antan Zinua Relezai Undan cinema release ii antham cinema release ie thundi nigua Damotha Edu
+
+కార్తిక్,అంబాసిడర్ కార్ విండో సీట్ లో కూర్చోని, చూయింగ్ గమ్ నములుతూ బవిష్యతు గురించి చిరాకుపడుతున్నాడు.
+
+                                                                                                              Inner monologue/VO
+
+                                                                                                 Jeevitham lo oka position vunte ne
+
+                                                                                                           pelli, pillalu, sontha illu/
+
+                                                                                                kaneesam oka decent illu konacchu,
+
+                                                                                                       appudu amma kooda happy
+
+                                                  Ee Shankar sir emo aravai yellu dhaatina retire ayithaledu, vacche jeetham pasial
+                                                                                                                        saripothalev
+
+                                                                                                                 “”Pchhhh….kavya*
+
+Scene 1a
+
+Dialogue
+
+SI shankar :sorry nanna
+                                                                                                           /./
+he said with his genial grin
+
+నాకు చాలా ఇంపార్టెంట్ పనుంది,
+
+ నువ్వు బ్యాంక్ దగ్గ ర ఉండు. తెలిదు ఎప్పుడు ఎవడికి ఏం ఆలోచన వస్తు ందో . Spandana okkatthe
+head office nunchi vacchetoniki kosam wait chesthondhi. Naku telusu neeku kavya ni
+kalisedhivundhani, kaani idhi emergency. Meekinkaa chaala weekends vunnaayi
+kalusukovadaniki,</div></article>
+ <article class="scene"><h3>సీన్ 2</h3><div class="sceneText" data-scene="2" contenteditable="false">Scene 2
+
+సమయం ఇప్పుడు మూడు నలభై ఐదు
+
+kavya ని చూడాలనే ఆశలన్నీ ఇప్పుడు మాయమయ్యాయి. అతను కారు సీటులో చిరాకుగా
+కదులుతున్నప్పుడు, bihar నంబర్ ప్లేట్‌లతో కూడిన dhummu pattina Premier 118NE
+&#x27;VICEROY&#x27; ni అతను గుర్తించాడు, అది bank ni దాటుతున్నప్పుడు వేగాన్ని తగ్గించాడు.
+మునిసిపల్‌ పార్కింగ్‌ వద్ద కు వెళ్లి ంది.6 feet, భారీగా kandalunna వ్యక్తి కారు దిగి తిరిగి బ్యాంకు వైపు
+నడుస్తూ వస్తు న్నాడు.
+
+కార్తీక్ aa మనిషిని study చేశాడు, అతని కళ్ళు alert ga ఉన్నాయి.
+
+“hmm,Gym body “,ani కార్తీక్ తనకు తానుగా చెప్పాడు.
+
+  అతను sunayasanga pedda pedda adugulu vesthunnadu, అతని భుజాలు విశాలంగా
+ఉన్నాయి ,అలసట లేకుండా మైళ్ళను కవర్ చేయగలడు .ఆ vyakthi బ్యాంకు vaipu velthundatam
+tho కార్తీక్‌కు inka gamaninchadaniki time లేదు.</div></article>
+ <article class="scene"><h3>సీన్ 3</h3><div class="sceneText" data-scene="3" contenteditable="false">Scene 3
+
+కార్తీక్ తన కారు దిగి ముందుకు kadili
+
+‘eyy!’ అని athaniki vinipichelaga పిలిచాడు,
+
+‘ఒక్క నిమిషం!
+
+ఆ aaradugula manishi okkasariga vennaki తిరిగి చూశాడు. అంబాసిడర్ కార్ లో నించి కార్తిక్
+దిగి ఐదు అడుగుల్లో అతనితో చేరాడు.ఇప్పుడు కార్తిక్ ఈ వ్యక్తికి దగ్గ రగా ఉన్నాడు, sharp eyes ,cigaretlu
+taagi nalla badda pedhalu,kruramaina dhavada
+
+కార్తిక్ :&quot;బ్యాంక బంద్ ఇయ్యాల…Em kaavaali&quot;
+
+ఎవడ్రా నువ్వు అన్నట్టు చూస్తా డు ఆరడుగుల మనిషి
+
+జెర్కిన్ లో నించి ఇ.డి తీసి ,చూపిస్తూ
+
+&quot;కార్తిక్ , డబీర్‌పూర్ a.s.i.....Em pani&quot;
+                                                                                                        ’
+‘నేను arjun’ అని navvutho ఆ వ్యక్తి చెప్పాడు. ‘నేను బ్యాంక్‌కి కొత్త మేనేజర్‌ని.’
+
+నీ aa మనిషి నవ్వినప్పుడు aah charm tho ఇవన్నీ హఠాత్తు గా కరిగిపో యాయి: ఇది విశాలమైన, స్నేహపూర్వక
+చిరునవ్వు.
+
+అతను మొదటి చూపులోనే ఈ వ్యక్తిని ఎందుకు ఇష్ట పడలేదు అని కార్తీక్ అకస్మాత్తు గా ఆశ్చర్యపో తాడు.
+
+కార్తీక్ తిరిగి navvadu.
+
+Mee id choopisthara please ?
+
+Koncham mee id chupisthara ?
+
+Arjun తన బ్యాంక్ I.D తీసి ఇచ్చాడు.
+
+  &#x27;ఇది saripothundha ? avasaramunnapudu meeru bank ni baaga chusukuntarani
+telusthondi .
+
+కార్తీక్ i d ni check చేసి, దానిని తిరిగి ఇచ్చాడు.
+
+‘Spandana garu okkarey unnarani, SI nannu bank ni chuskomannaru, andhukey
+ikkadUNLASOCHINDI , ippudu meerocharu kada,నేను VELTHANU.’
+
+/“Bank lo Spandana garu okkarey unnarani, SI nannu bank deggara undamannaru,
+andhukey ikkadUNLASOCHINDI ,ippudu meerocharu kada,నేను VELTHANU.”
+
+arjun choopu churukga undu kani
+
+విశాలమైన, స్నేహపూర్వకమైన చిరునవ్వు చాలా స్పష్ట ంగా కనిపించింది.
+
+అర్జు న్ : రావు గారికి ఎలా ఉంది ?
+
+కార్తీక్ భుజాలు ఎగిరెసాడు .
+
+‘ayana paristhiti antha manchiga ledu
+
+( chaala darunga undi.) doctors em cheppalem antunnaru
+
+Arjun సానుభూతితో కూడిన శబ్దా లు చేశాడు.
+
+అర్జు న్ : Ayyo. sarey nenelli spandani kalusthanu, thanu intikellalani edhuruchusthuntadhi.
+
+Scene 3a
+
+Iddaru kalisi bank vaipu nadusthunnaru
+
+“Aame chaala shock ayyindhi. Office lo Rao gaaru nela meedha padundatam
+chusindhi.”
+
+ఇద్ద రు బ్యాంకు entrance door ప్రవేశ ద్వారం వద్ద కు చేరుకున్నప్పుడు, తలుపు తెరుచుకుంది
+మరియు ఒక అమ్మాయి తలుపుla madhyalo నిలబడి ఉంది. Arjun ఒక్క chooputhoo motham
+chadivesadu(checkout ).
+
+{{ Inner monologue
+
+ఆమెku దాదాపు ఇరవై ఐదు లేదా iravai ఆరు, మధ్యస్థ ఎత్తు బలహీనంగా కనిపిస్తు ంది. ఆమె
+ధరించిన రిమ్‌లెస్ కళ్ల ద్దా లu ,kattu bottu chusthey vayasayipothunna inka pelli kaledu .
+సాదాసీదాగా కనిపించినప్పటికీ, ఆమె ఛాయ బాగుంది. ఆమె మౌస్ రంగు జుట్టు చక్కగా ఉంది.
+
+}}
+
+“eena/ మిస్ట ర్ arjun&#x27; ani కార్తీక్ చెప్పాడు.
+
+“eena vachey daaka eeda undalanukunna. “
+
+Spandana arjun వైపు చూస్తో ంది: ఆమె ముఖం ibbandi karamaina siggutho errabadindi.
+Arjun ఆమెను చూసి నవ్వాడు. Athani charm spandana పై baariga ప్రభావాన్ని చూపుతున్నట్లు
+అనిపించింది.
+
+“sorry Spandana garu, మిమ్మల్ని intha sepu wait cheyinchinanduku “
+
+Arjun ఆ అమ్మాయిపై తను చేస్తు న్న prabhavam తెలుసుకుని/ardham ayyi
+
+‘short notice kada, chaala dooram nunchi ravali…so,late ayyindi’ అని చెప్పాడు.
+
+‘Aa…parledhu sir,’ ఆమె తడబడుతోంది.
+
+‘నేను –nenu expect cheyyaledhu... meeru లోపలికి రారా?’
+
+కార్తీక్: సరే, neninkeltha. Nice meeting you, Mr. Arjun. Em avasaram unna,kaali nannu
+adagandi.nenu station laney unta.</div></article>
+ <article class="scene"><h3>సీన్ 4</h3><div class="sceneText" data-scene="4" contenteditable="false">Scene 4
+
+Arjun shake hand ichi,spandana ni follow avutho bank lo kelladu. కార్తీక్ తన కారు
+deggariki తిరిగి వెళ్ళాడు. Arjun బ్యాంకు తలుపులు వేసి చుట్టూ చూశాడు. చాలా చిన్న bank. Anni
+banks lo vunnatte oka saadharana గ్రిల్-కౌంటర్ ఉంది. Dhaani వెనుక అద్దా ల office. అతనికి
+సమీపంలో ఒక తలుపు మరియు కౌంటర్ వెనుక అతనికి ఎదురుగా మరొక తలుపు ఉన్నాయి. వేచి
+ఉండే కస్ట మర్ల కోసం చెక్క సీటు మరియు మ్యాగజైన్‌లు మరియు flower vase ఉన్న టేబుల్
+ఉన్నాయి.
+
+ Arjun office choosthunte, Spandana అతనిని choosthundhi. ఆమె ముఖంపై              siggu ni
+aapukodaniki ఆమె ఫలించని ప్రయత్నాలు చేయడం అతను చూడగలిగాడు.
+
+‘I am sorry about Mr.rao ’ అని arjunచెప్పాడు.
+
+‘Rao garini chusi chaala kangaru paduntaru,. మీరు నాకు keys ఇచ్చి, intikelli rest
+teesukocchu kadha?
+
+సో మవారం వరకు manam cheyyataaniki emi ledhu.’
+
+ఆమె ఆశ్చర్యంగా చూసింది.
+
+‘మీరు ippudem Check cheyara’
+
+&#x27;ఇప్పుdu కాదు,&#x27; ani navvi, ‘సో మవారం చేస్తా ’
+
+ఆమె siggu అతనికి చిరాకు తెప్పించడంతో అతను ఆమె వైపు చూడకుండా ఆమెని దాటి mundhuku
+velli, మేనేజర్ office తలుపు తెరిచాడు.</div></article>
+
+</section>
+</main>
+<script>
+(()=>{
+ const btn=document.getElementById('mainBtn'),music=document.getElementById('musicPanel'),script=document.getElementById('scriptPanel'),message=document.getElementById('message');
+const R2_BASE="https://pub-605a5474ba3d4783a4538d26ddcf4389.r2.dev";
+const TRACKS=[{"title":"Trans-Europe Express","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/01 - Trans-Europe Express (2009 Remaster).mp3"},{"title":"The Model","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/02 - The Model (2009 Remaster).mp3"},{"title":"The Robots","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/03 - The Robots (2009 Remaster).mp3"},{"title":"Computer Love","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/04 - Computer Love (2009 Remaster).mp3"},{"title":"Radioactivity","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/05 - Radioactivity (2009 Remaster).mp3"},{"title":"Numbers","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/06 - Numbers (2009 Remaster).mp3"},{"title":"Autobahn","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/07 - Autobahn (2009 Remaster).mp3"},{"title":"Tour de France","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/08 - Tour de France (2009 Remaster).mp3"},{"title":"Pocket Calculator","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/09 - Pocket Calculator (2009 Remaster).mp3"},{"title":"Neon Lights","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/10 - Neon Lights (2009 Remaster).mp3"},{"title":"The Telephone Call","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/11 - The Telephone Call (2009 Remaster).mp3"},{"title":"The Man Machine","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/12 - The Man Machine (2009 Remaster).mp3"},{"title":"Computer World","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/13 - Computer World (2009 Remaster).mp3"},{"title":"Showroom Dummies","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/14 - Showroom Dummies (2009 Remaster).mp3"},{"title":"Musique Non Stop","key":"kraftwerk/Kraftwerk - Essentials (2020) Mp3 320kbps [PMEDIA] ⭐️/15 - Musique Non Stop (2009 Remaster).mp3"}];
+const audio=document.getElementById('audioPlayer'),playPause=document.getElementById('playPause'),trackLabel=document.getElementById('trackLabel'),playerMessage=document.getElementById('playerMessage');
+const playlist=document.getElementById('playlist'),seekBar=document.getElementById('seekBar'),elapsed=document.getElementById('elapsed'),duration=document.getElementById('duration');
+let trackIndex=0;
+function trackUrl(key){return R2_BASE+'/'+key.split('/').map(encodeURIComponent).join('/')}
+function formatTime(seconds){if(!Number.isFinite(seconds))return '0:00';seconds=Math.max(0,Math.floor(seconds));return Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0')}
+function playerStatus(t){playerMessage.textContent=t}
+function updatePlayButton(){playPause.textContent=audio.paused?'PLAY':'PAUSE';for(const b of playlist.querySelectorAll('.trackItem')){const active=Number(b.dataset.index)===trackIndex;b.classList.toggle('active',active);b.setAttribute('aria-current',active?'true':'false');const state=b.querySelector('.trackPlaying');state.textContent=active&&!audio.paused?'PLAYING':'';}}
+function selectTrack(index,shouldPlay=false){trackIndex=(index+TRACKS.length)%TRACKS.length;const t=TRACKS[trackIndex];audio.pause();audio.src=trackUrl(t.key);audio.load();trackLabel.textContent=String(trackIndex+1).padStart(2,'0')+' — '+t.title;seekBar.value=0;elapsed.textContent='0:00';duration.textContent='0:00';playerStatus('');updatePlayButton();if(shouldPlay)startPlayback();}
+async function startPlayback(){try{await audio.play();playerStatus('')}catch(e){playerStatus('Browser blocked automatic playback. Press PLAY to start.')}}
+function togglePlayback(){if(audio.paused)startPlayback();else audio.pause()}
+TRACKS.forEach((t,i)=>{const b=document.createElement('button');b.type='button';b.className='trackItem';b.dataset.index=i;const n=document.createElement('span');n.className='trackNumber';n.textContent=String(i+1).padStart(2,'0');const name=document.createElement('span');name.className='trackName';name.textContent=t.title;const state=document.createElement('span');state.className='trackPlaying';b.append(n,name,state);b.addEventListener('click',()=>selectTrack(i,true));playlist.append(b)});
+playPause.addEventListener('click',togglePlayback);
+document.getElementById('prevTrack').addEventListener('click',()=>selectTrack(trackIndex-1,true));
+document.getElementById('nextTrack').addEventListener('click',()=>selectTrack(trackIndex+1,true));
+document.getElementById('backOne').addEventListener('click',()=>{audio.currentTime=Math.max(0,audio.currentTime-1)});
+document.getElementById('forwardOne').addEventListener('click',()=>{audio.currentTime=Math.min(Number.isFinite(audio.duration)?audio.duration:Infinity,audio.currentTime+1)});
+document.getElementById('volumeBar').addEventListener('input',e=>{audio.volume=Number(e.target.value)});
+seekBar.addEventListener('input',()=>{if(Number.isFinite(audio.duration)&&audio.duration>0)audio.currentTime=audio.duration*Number(seekBar.value)/1000});
+audio.addEventListener('timeupdate',()=>{elapsed.textContent=formatTime(audio.currentTime);if(Number.isFinite(audio.duration)&&audio.duration>0)seekBar.value=String(Math.round(1000*audio.currentTime/audio.duration))});
+audio.addEventListener('loadedmetadata',()=>{duration.textContent=formatTime(audio.duration)});
+audio.addEventListener('play',updatePlayButton);audio.addEventListener('pause',updatePlayButton);
+audio.addEventListener('ended',()=>selectTrack(trackIndex+1,true));
+audio.addEventListener('error',()=>playerStatus('Cannot load track. Check the R2 public URL and file permissions.'));
+audio.volume=.8;selectTrack(0,false);
+
+ const palette=[['#151515','#f5f3ed'],['#0b684b','#ffffff'],['#6e39b5','#ffffff'],['#f5c542','#161616'],['#cc3b52','#ffffff'],['#185f9c','#ffffff'],['#ece7da','#191919']];
+ let colour=0,clicks=0,timer=null;const windowMs=430;
+ function status(t){message.textContent=t}
+ function closePanels(){music.classList.add('hidden');script.classList.add('hidden')}
+ function act(n){if(n===1){colour=(colour+1)%palette.length;document.documentElement.style.setProperty('--bg',palette[colour][0]);document.documentElement.style.setProperty('--fg',palette[colour][1]);status('')}
+ else if(n===2){script.classList.add('hidden');music.classList.toggle('hidden');if(!music.classList.contains('hidden')){if(audio.paused)startPlayback()}else{audio.pause()}status('')}
+ else{music.classList.add('hidden');script.classList.remove('hidden');status('')}}
+ btn.addEventListener('click',()=>{clicks++;clearTimeout(timer);if(clicks>=3){clicks=0;act(3);return}timer=setTimeout(()=>{const n=clicks;clicks=0;act(n)},windowMs)});
+ btn.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){/* native button click handles keyboard */}});
+ document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>{document.getElementById(b.dataset.close).classList.add('hidden');if(b.dataset.close==='musicPanel')audio.pause();status('CLOSED')}));
+ const fields=[...document.querySelectorAll('.sceneText')],key='operationkinoz-scenes-master-v2';
+ try{const saved=JSON.parse(localStorage.getItem(key)||'null');if(Array.isArray(saved)&&saved.length===4){fields.forEach((el,i)=>el.textContent=String(saved[i]??''))}}catch(e){status('Stored changes could not be loaded')}
+ function editing(on){fields.forEach(el=>el.contentEditable=String(on))}
+ document.getElementById('editBtn').addEventListener('click',()=>{editing(true);fields[0].focus();status('EDIT MODE')});
+ document.getElementById('previewBtn').addEventListener('click',()=>{editing(false);status('PREVIEW MODE')});
+ document.getElementById('saveBtn').addEventListener('click',()=>{try{localStorage.setItem(key,JSON.stringify(fields.map(el=>el.innerText)));editing(false);status('SAVED IN THIS BROWSER')}catch(e){status('SAVE FAILED — CHECK BROWSER STORAGE')}});
+})();
+</script>
+</body>
+</html>
